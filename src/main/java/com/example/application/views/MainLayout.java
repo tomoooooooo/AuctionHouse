@@ -5,7 +5,7 @@ import com.example.application.components.appnav.AppNav;
 import com.example.application.components.appnav.AppNavItem;
 import com.example.application.views.addauction.AddAuctionView;
 import com.example.application.views.auctions.AuctionsView;
-import com.example.application.views.yourauctions.YourauctionsView;
+import com.example.application.views.yourauctions.YourAuctionsView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.Footer;
@@ -56,7 +56,7 @@ public class MainLayout extends AppLayout {
         AppNav nav = new AppNav();
 
         nav.addItem(new AppNavItem("Auctions", AuctionsView.class, LineAwesomeIcon.TH_LIST_SOLID.create()));
-        nav.addItem(new AppNavItem("Your auctions", YourauctionsView.class, LineAwesomeIcon.TH_LIST_SOLID.create()));
+        nav.addItem(new AppNavItem("Your auctions", YourAuctionsView.class, LineAwesomeIcon.TH_LIST_SOLID.create()));
         nav.addItem(new AppNavItem("Add Auction", AddAuctionView.class, LineAwesomeIcon.PLUS_CIRCLE_SOLID.create()));
 
         return nav;

@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 
 @PageTitle("Add Auction")
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "addauction", layout = MainLayout.class)
 public class AddAuctionView extends VerticalLayout {
 
     public AddAuctionView() {

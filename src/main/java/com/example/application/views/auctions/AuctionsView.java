@@ -1,5 +1,6 @@
 package com.example.application.views.auctions;
 
+import com.example.application.data.AuctionsViewCard;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
@@ -24,7 +25,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
 @PageTitle("Auctions")
-@Route(value = "auctions", layout = MainLayout.class)
+@Route(value = "", layout = MainLayout.class)
 public class AuctionsView extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;

@@ -1,4 +1,4 @@
-package com.example.application.views.auctions;
+package com.example.application.data;
 
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -19,9 +19,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
-public class AuctionsViewCard extends ListItem {
+public class YourAuctionsViewCard extends ListItem {
 
-    public AuctionsViewCard(String text, String url) {
+    public YourAuctionsViewCard(String text, String url) {
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE);
 
@@ -32,7 +32,7 @@ public class AuctionsViewCard extends ListItem {
 
         Image image = new Image();
         image.setWidth("100%");
-        image.setSrc(url);
+        //image.setSrc(url);
         image.setAlt(text);
 
         div.add(image);
