@@ -8,9 +8,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
+import jakarta.annotation.security.PermitAll;
 
 @PageTitle("Add Auction")
 @Route(value = "addauction", layout = MainLayout.class)
+@PermitAll
 public class AddAuctionView extends VerticalLayout {
 
     public AddAuctionView() {

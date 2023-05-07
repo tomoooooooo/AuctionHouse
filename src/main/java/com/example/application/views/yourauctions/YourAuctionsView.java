@@ -24,9 +24,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
+import jakarta.annotation.security.PermitAll;
 
 @PageTitle("Your auctions")
 @Route(value = "2", layout = MainLayout.class)
+@PermitAll
 public class YourAuctionsView extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
