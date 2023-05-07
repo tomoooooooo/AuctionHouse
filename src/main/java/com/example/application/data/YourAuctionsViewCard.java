@@ -1,10 +1,13 @@
 package com.example.application.data;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
@@ -31,9 +34,11 @@ public class YourAuctionsViewCard extends ListItem {
         div.setHeight("160px");
 
         Image image = new Image();
-        image.setWidth("100%");
+
         //image.setSrc(url);
         image.setAlt(text);
+
+
 
         div.add(image);
 
@@ -49,11 +54,19 @@ public class YourAuctionsViewCard extends ListItem {
                 "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.");
         description.addClassName(Margin.Vertical.MEDIUM);
 
-        Span badge = new Span();
-        badge.getElement().setAttribute("theme", "badge");
-        badge.setText("Label");
+        Button view = new Button("View!");
+        view.addClickListener(e -> {
+            UI.getCurrent().navigate("auctionItem");
+        });
+        Button delete = new Button("Delete");
+        delete.getStyle().set("background-color", "red");
+        Button edit = new Button("Edit");
 
-        add(div, header, subtitle, description, badge);
+        HorizontalLayout horizontalLayout = new HorizontalLayout(view, delete, edit
+        );
+        add(horizontalLayout);
+
+        add(div, header, subtitle, description, horizontalLayout);
 
     }
 }
