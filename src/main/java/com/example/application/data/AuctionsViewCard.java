@@ -1,5 +1,7 @@
 package com.example.application.data;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.ListItem;
@@ -49,11 +51,13 @@ public class AuctionsViewCard extends ListItem {
                 "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.");
         description.addClassName(Margin.Vertical.MEDIUM);
 
-        Span badge = new Span();
-        badge.getElement().setAttribute("theme", "badge");
-        badge.setText("Label");
 
-        add(div, header, subtitle, description, badge);
+        Button view = new Button("View!");
+        view.addClickListener(e -> {
+            UI.getCurrent().navigate("auctionItem");
+        });
+
+        add(div, header, subtitle, description, view);
 
     }
 }

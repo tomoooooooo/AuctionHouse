@@ -1,4 +1,4 @@
-package com.example.application.views.yourauctions;
+package com.example.application.views.favoriteauctions;
 
 import com.example.application.data.AuctionsViewCard;
 import com.example.application.data.YourAuctionsViewCard;
@@ -27,27 +27,27 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
 
-@PageTitle("Your auctions")
-@Route(value = "2", layout = MainLayout.class)
+@PageTitle("Favorite auctions")
+@Route(value = "favorite", layout = MainLayout.class)
 @PermitAll
-public class YourAuctionsView extends Main implements HasComponents, HasStyle {
+public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
 
-    public YourAuctionsView() {
+    public FavoriteAuctions() {
         constructUI();
 
-        imageContainer.add(new YourAuctionsViewCard("Snow mountains under stars",
+        imageContainer.add(new AuctionsViewCard("Snow mountains under stars",
                 "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new YourAuctionsViewCard("Snow covered mountain",
+        imageContainer.add(new AuctionsViewCard("Snow covered mountain",
                 "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new YourAuctionsViewCard("River between mountains",
+        imageContainer.add(new AuctionsViewCard("River between mountains",
                 "https://images.unsplash.com/photo-1536048810607-3dc7f86981cb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80"));
-        imageContainer.add(new YourAuctionsViewCard("Milky way on mountains",
+        imageContainer.add(new AuctionsViewCard("Milky way on mountains",
                 "https://images.unsplash.com/photo-1515705576963-95cad62945b6?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new YourAuctionsViewCard("Mountain with fog",
+        imageContainer.add(new AuctionsViewCard("Mountain with fog",
                 "https://images.unsplash.com/photo-1513147122760-ad1d5bf68cdb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"));
-        imageContainer.add(new YourAuctionsViewCard("Mountain at night",
+        imageContainer.add(new AuctionsViewCard("Mountain at night",
                 "https://images.unsplash.com/photo-1562832135-14a35d25edef?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=815&q=80"));
 
     }
