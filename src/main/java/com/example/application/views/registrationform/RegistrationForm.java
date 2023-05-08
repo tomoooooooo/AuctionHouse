@@ -18,8 +18,8 @@ public class RegistrationForm extends FormLayout{
     private H3 title;
     private TextField firstName;
     private TextField lastName;
+    private TextField userName;
     private EmailField email;
-    private TextField username;
     private PasswordField password;
     private PasswordField passwordConfirm;
     private Checkbox allowMarketing;
@@ -32,6 +32,7 @@ public class RegistrationForm extends FormLayout{
         title = new H3("Signup form");
         firstName = new TextField("First name");
         lastName = new TextField("Last name");
+        userName = new TextField("User name");
         email = new EmailField("Email");
         username = new TextField("Username");
         password = new PasswordField("Password");
