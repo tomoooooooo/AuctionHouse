@@ -26,6 +26,8 @@ public class RegistrationForm extends FormLayout{
     private TextField firstName;
     private TextField lastName;
 
+    private TextField userName;
+
     private EmailField email;
 
     private PasswordField password;
@@ -43,13 +45,14 @@ public class RegistrationForm extends FormLayout{
         title = new H3("Signup form");
         firstName = new TextField("First name");
         lastName = new TextField("Last name");
+        userName = new TextField("User name");
         email = new EmailField("Email");
 
 
         password = new PasswordField("Password");
         passwordConfirm = new PasswordField("Confirm password");
 
-        setRequiredIndicatorVisible(firstName, lastName, email, password,
+        setRequiredIndicatorVisible(firstName, lastName, userName, email, password,
                 passwordConfirm);
 
         errorMessageField = new Span();
@@ -57,7 +60,7 @@ public class RegistrationForm extends FormLayout{
         submitButton = new Button("Join the community");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(title, firstName, lastName, email, password,
+        add(title, firstName, lastName, userName, email, password,
                 passwordConfirm, errorMessageField,
                 submitButton);
 
