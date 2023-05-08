@@ -1,6 +1,5 @@
 package com.example.application.views.registrationform;
 
-import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -8,33 +7,23 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import java.util.stream.Stream;
 
 public class RegistrationForm extends FormLayout{
 
     private H3 title;
-
     private TextField firstName;
     private TextField lastName;
-
     private EmailField email;
-
+    private TextField username;
     private PasswordField password;
     private PasswordField passwordConfirm;
-
     private Checkbox allowMarketing;
-
     private Span errorMessageField;
-
     private Button submitButton;
 
 
@@ -44,22 +33,18 @@ public class RegistrationForm extends FormLayout{
         firstName = new TextField("First name");
         lastName = new TextField("Last name");
         email = new EmailField("Email");
-
-
+        username = new TextField("Username");
         password = new PasswordField("Password");
         passwordConfirm = new PasswordField("Confirm password");
 
-        setRequiredIndicatorVisible(firstName, lastName, email, password,
-                passwordConfirm);
+        setRequiredIndicatorVisible(firstName, lastName, email, username, password, passwordConfirm);
 
         errorMessageField = new Span();
 
         submitButton = new Button("Join the community");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(title, firstName, lastName, email, password,
-                passwordConfirm, errorMessageField,
-                submitButton);
+        add(title, firstName, lastName, email, username, password, passwordConfirm, errorMessageField, submitButton);
 
         // Max width of the Form
         setMaxWidth("500px");
@@ -74,6 +59,7 @@ public class RegistrationForm extends FormLayout{
         // These components always take full width
         setColspan(title, 2);
         setColspan(email, 2);
+        setColspan(username, 2);
         setColspan(errorMessageField, 2);
         setColspan(submitButton, 2);
     }

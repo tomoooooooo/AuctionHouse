@@ -1,6 +1,7 @@
 package com.example.application.security;
 
-import com.example.application.data.entity.UserDetails;
+import com.example.application.data.entity.Users;
+import com.example.application.data.services.RegistrationService;
 import com.example.application.views.registrationform.RegistrationForm;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -16,13 +17,9 @@ public class RegistrationFormBinder {
 
     private boolean enablePasswordValidation;
 
-    public RegistrationFormBinder(RegistrationForm registrationForm) {
-        this.registrationForm = registrationForm;
-    }
-
 
     public void addBindingAndValidation() {
-        BeanValidationBinder<UserDetails> binder = new BeanValidationBinder<>(UserDetails.class);
+        BeanValidationBinder<Users> binder = new BeanValidationBinder<>(Users.class);
         binder.bindInstanceFields(registrationForm);
 
 
@@ -44,7 +41,7 @@ public class RegistrationFormBinder {
         registrationForm.getSubmitButton().addClickListener(event -> {
             try {
 
-                UserDetails userBean = new UserDetails();
+                Users userBean = new Users();
 
 
                 binder.writeBean(userBean);
@@ -79,7 +76,8 @@ public class RegistrationFormBinder {
     }
 
 
-    private void showSuccess(UserDetails userBean) {
+    private void showSuccess(Users userBean) {
+        //registrationService.signup(userBean);
         Notification notification =
                 Notification.show("Data saved, welcome " + userBean.getFirstName());
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
