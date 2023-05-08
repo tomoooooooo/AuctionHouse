@@ -1,6 +1,8 @@
-package com.example.application.views.auctions;
+package com.example.application.views.favoriteauctions;
 
 import com.example.application.data.AuctionsViewCard;
+import com.example.application.data.YourAuctionsViewCard;
+import com.example.application.data.entity.Auction;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
@@ -13,7 +15,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
@@ -26,14 +27,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
 
-@PageTitle("Auctions")
-@Route(value = "", layout = MainLayout.class)
-@AnonymousAllowed
-public class AuctionsView extends Main implements HasComponents, HasStyle {
+@PageTitle("Favorite auctions")
+@Route(value = "favorite", layout = MainLayout.class)
+@PermitAll
+public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
 
-    public AuctionsView() {
+    public FavoriteAuctions() {
         constructUI();
 
         imageContainer.add(new AuctionsViewCard("Snow mountains under stars",
@@ -59,9 +60,9 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
         container.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
 
         VerticalLayout headerContainer = new VerticalLayout();
-        H2 header = new H2("Auction Items");
+        H2 header = new H2("Favorite Auction Items");
         header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
-        Paragraph description = new Paragraph("Here you can find the items added for auction!");
+        Paragraph description = new Paragraph("Here you can find the items added by you as favorites.");
         description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
 
