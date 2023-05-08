@@ -5,6 +5,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -52,7 +53,14 @@ public class AuctionItem extends VerticalLayout {
         status.setWidth("200px");
         status.setHeight("32px");
 
-        HorizontalLayout horizontaldetails = new HorizontalLayout(details, status
+        Button favorite = new Button("Add Favorite!");
+        favorite.addClickListener(e ->{
+            Notification notification = Notification
+                    .show("Added to favorite!");
+        });
+        favorite.getStyle().set("margin-top", "60px");
+
+        HorizontalLayout horizontaldetails = new HorizontalLayout(details, status, favorite
         );
         horizontaldetails.setWidth("800px");
         add(horizontaldetails);
@@ -77,7 +85,12 @@ public class AuctionItem extends VerticalLayout {
             UI.getCurrent().navigate("");
         });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(back, bid
+        Button automatic = new Button("Automatic Bid");
+        automatic.addClickListener(e -> {
+            UI.getCurrent().navigate("automaticBid");
+        });
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(back, automatic, bid
                 );
         add(horizontalLayout);
 
