@@ -1,27 +1,28 @@
 package com.example.application.data.entity;
 
+import com.example.application.databaseactions.dbConnect;
+import com.vaadin.flow.component.notification.Notification;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
-@EqualsAndHashCode
-public class Users implements UserDetails {
+public class Users{
 
     @Id
     @SequenceGenerator(name = "useridgenerator", initialValue = 1000, allocationSize = 1)
@@ -35,28 +36,12 @@ public class Users implements UserDetails {
     @NotBlank
     @Email
     private String email;
-    private boolean allowsMarketing;
     @NotBlank
     private String username;
     @Size(min = 4, max = 64, message = "Password must be 4-64 char long")
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-    private Boolean locked;
-    private Boolean enabled;
-
-
-    public Users(String firstName, String lastName, String email, boolean allowsMarketing, String username, String password, UserRole userRole, Boolean locked, Boolean enabled) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.allowsMarketing = allowsMarketing;
-        this.username = username;
-        this.password = password;
-        this.userRole = userRole;
-        this.locked = locked;
-        this.enabled = enabled;
-    }
 
     public Users(String firstName, String lastName, String email, String username, String password, UserRole userRole) {
         this.firstName = firstName;
@@ -67,41 +52,27 @@ public class Users implements UserDetails {
         this.userRole = userRole;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {return password;}
 
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !locked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
-        return Collections.singletonList(authority);
+    public void addToDb() throws SQLException {
+        try {
+            Connection conn = dbConnect.connect();
+            PreparedStatement ps = null;
+            String sql = "INSERT INTO USERS (id, first_name, last_name, email, username, password, user_role) VALUES(?, ?, ?, ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql);
+            ps.setLong(1, 100);
+            ps.setString(2, firstName);
+            ps.setString(3, lastName);
+            ps.setString(4, email);
+            ps.setString(5, username);
+            ps.setString(6, password);
+            ps.setString(7, userRole.toString());
+            ps.execute();
+            ps.close();
+            conn.close();
+        }catch(SQLException e){
+            System.out.println(e.toString());
+        }
     }
 
     @Override
@@ -111,7 +82,6 @@ public class Users implements UserDetails {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", allowsMarketing=" + allowsMarketing +
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 '}';

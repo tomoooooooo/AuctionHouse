@@ -1,6 +1,5 @@
 package com.example.application.views.registrationform;
 
-import com.example.application.security.RegistrationFormBinder;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -18,7 +17,7 @@ public class RegistrationView extends VerticalLayout {
 
         add(registrationForm);
 
-        RegistrationFormBinder registrationFormBinder = new RegistrationFormBinder(registrationForm);
-        registrationFormBinder.addBindingAndValidation();
+     //  RegistrationFormBinder registrationFormBinder = new RegistrationFormBinder();
+      // registrationFormBinder.addBindingAndValidation();
     }
 }
