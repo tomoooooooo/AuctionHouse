@@ -1,8 +1,8 @@
 
 package com.example.application.security;
 
-import com.example.application.data.entity.UserRole;
-import com.example.application.databaseactions.dbConnect;
+import com.example.application.data.entity.Users;
+import com.example.application.data.services.UserService;
 import com.example.application.views.loginview.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import org.springframework.context.annotation.Bean;
@@ -14,16 +14,19 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig extends VaadinWebSecurity {
+
+
+    private final UserService userService;
+
+    public SecurityConfig(UserService userService) {
+        this.userService = userService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -35,44 +38,42 @@ public class SecurityConfig extends VaadinWebSecurity {
 
     @Bean
     public UserDetailsService users() {
-
-
-        List<UserDetails> users = new ArrayList<UserDetails>();
-        Connection conn = dbConnect.connect();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        String sql = "SELECT username, password, user_role FROM USERS";
-        try {
-            ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-
-            while(rs.next()) {
-                UserDetails user = User.builder()
-                        .username(rs.getString("username"))
-                        .password("{noop}" +rs.getString("password"))
-                        .roles("USER")
-                        .build();
-
-                users.add(user);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+/*
         UserDetails user = User.builder()
                 .username("user")
                 // password = password with this hash, don't tell anybody :-)
                 .password("{noop}password")
                 .roles("USER")
                 .build();
-      /*  UserDetails admin = User.builder()
+        UserDetails admin = User.builder()
                 .username("admin")
                 .password("{bcrypt}$2a$10$GRLdNijSQMUvl/au9ofL.eDwmoohzzS7.rmNSJZ.0FxO/BTk76klW")
                 .roles("USER", "ADMIN")
                 .build();
+*/
 
-       */
-        users.add(user);
-        return new InMemoryUserDetailsManager(users);
+        List<UserDetails> userDetails = new ArrayList<>();
+        List<Users> users = userService.findAll();
+
+        for(Users u : users)
+        {
+            UserDetails user1 = User.builder()
+                    .username(u.getUsername())
+                    .password("{noop}"+u.getPassword())
+                    .roles("USER")
+                    .build();
+
+            userDetails.add(user1);
+        }
+        return new InMemoryUserDetailsManager(userDetails);
+
+//        UserDetails user = User.withDefaultPasswordEncoder()
+//                .username("user")
+//                .password("password")
+//                .roles("USER")
+//                .build();
+//        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+//        users.createUser(user);
+//        return users;
     }
 }

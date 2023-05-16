@@ -17,7 +17,7 @@ public class RegistrationView extends VerticalLayout {
 
         add(registrationForm);
 
-     //  RegistrationFormBinder registrationFormBinder = new RegistrationFormBinder();
+      // RegistrationFormBinder registrationFormBinder = new RegistrationFormBinder();
       // registrationFormBinder.addBindingAndValidation();
     }
 }
