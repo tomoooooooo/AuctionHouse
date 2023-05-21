@@ -1,5 +1,7 @@
 package com.example.application.data;
 
+import com.example.application.data.entity.Auction;
+import com.example.application.data.services.AuctionService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -27,6 +29,8 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
 public class YourAuctionsViewCard extends ListItem {
 
+    private final AuctionService auctionService;
+
     private Span status;
 
     private void setStatus(String value) {
@@ -34,7 +38,8 @@ public class YourAuctionsViewCard extends ListItem {
         status.setVisible(true);
     };
 
-    public YourAuctionsViewCard(String text, String url) {
+    public YourAuctionsViewCard(Auction auction, AuctionService auctionService) {
+        this.auctionService = auctionService;
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE);
 
@@ -46,7 +51,7 @@ public class YourAuctionsViewCard extends ListItem {
         Image image = new Image();
 
         //image.setSrc(url);
-        image.setAlt(text);
+        image.setAlt("No image");
 
 
 
@@ -54,14 +59,13 @@ public class YourAuctionsViewCard extends ListItem {
 
         Span header = new Span();
         header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
-        header.setText("Title");
+        header.setText(auction.getTitle());
 
         Span subtitle = new Span();
         subtitle.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
         subtitle.setText("Card subtitle");
 
-        Paragraph description = new Paragraph(
-                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.");
+        Paragraph description = new Paragraph(auction.getDescription());
         description.addClassName(Margin.Vertical.MEDIUM);
 
         Button view = new Button("View!");
@@ -81,8 +85,7 @@ public class YourAuctionsViewCard extends ListItem {
 
             ConfirmDialog dialog = new ConfirmDialog();
             dialog.setHeader("Are you sure you want delete the selected item?");
-            dialog.setText(
-                    "You cannot undo the action!");
+            dialog.setText("You cannot undo the action!");
 
 
             dialog.setRejectable(true);
@@ -95,6 +98,7 @@ public class YourAuctionsViewCard extends ListItem {
 
             dialog.setConfirmText("Delete");
             dialog.addConfirmListener(event -> {
+                auctionService.delete(auction);
                 setStatus("Deleted");
                 Notification notification = Notification
                         .show("Item deleted");

@@ -1,6 +1,6 @@
 package com.example.application.views.yourauctions;
 
-import com.example.application.data.AuctionsViewCard;
+import com.example.application.data.YourAuctionsViewCard;
 import com.example.application.data.entity.Auction;
 import com.example.application.data.services.AuctionService;
 import com.example.application.security.SecurityService;
@@ -49,7 +49,7 @@ public class YourAuctionsView extends Main implements HasComponents, HasStyle {
 
         for(Auction a : auctions)
         {
-            imageContainer.add(new AuctionsViewCard(a));
+            imageContainer.add(new YourAuctionsViewCard(a, auctionService));
         }
 
     }
