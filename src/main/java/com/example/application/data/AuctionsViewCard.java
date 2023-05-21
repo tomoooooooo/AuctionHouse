@@ -1,5 +1,6 @@
 package com.example.application.data;
 
+import com.example.application.data.entity.Auction;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
@@ -23,7 +24,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
 public class AuctionsViewCard extends ListItem {
 
-    public AuctionsViewCard(String text, String url) {
+    public AuctionsViewCard(Auction auction) {
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE);
 
@@ -35,20 +36,19 @@ public class AuctionsViewCard extends ListItem {
         Image image = new Image();
         image.setWidth("100%");
        // image.setSrc(url);
-        image.setAlt(text);
+        image.setAlt("image not found");
 
         div.add(image);
 
         Span header = new Span();
         header.addClassNames(FontSize.XLARGE, FontWeight.SEMIBOLD);
-        header.setText("Title");
+        header.setText(auction.getTitle());
 
         Span subtitle = new Span();
         subtitle.addClassNames(FontSize.SMALL, TextColor.SECONDARY);
         subtitle.setText("Card subtitle");
 
-        Paragraph description = new Paragraph(
-                "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut.");
+        Paragraph description = new Paragraph(auction.getDescription());
         description.addClassName(Margin.Vertical.MEDIUM);
 
 

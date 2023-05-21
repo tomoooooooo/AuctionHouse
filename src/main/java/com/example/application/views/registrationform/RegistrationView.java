@@ -1,5 +1,6 @@
 package com.example.application.views.registrationform;
 
+import com.example.application.data.services.UserService;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -10,8 +11,11 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 @AnonymousAllowed
 public class RegistrationView extends VerticalLayout {
 
-    public RegistrationView() {
-        RegistrationForm registrationForm = new RegistrationForm();
+    private final UserService userService;
+
+    public RegistrationView(UserService userService) {
+        this.userService = userService;
+        RegistrationForm registrationForm = new RegistrationForm(this.userService);
         // Center the RegistrationForm
         setHorizontalComponentAlignment(Alignment.CENTER, registrationForm);
 

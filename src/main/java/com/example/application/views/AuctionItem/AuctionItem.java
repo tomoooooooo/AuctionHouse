@@ -20,7 +20,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import jakarta.annotation.security.PermitAll;
 
 @PageTitle("Auction Item")
-@Route(value = "auctionItem")
+@Route(value = "auctionItem/")
 @PermitAll
 
 public class AuctionItem extends VerticalLayout {

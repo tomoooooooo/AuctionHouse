@@ -26,9 +26,6 @@ public class AutomaticBid extends Main implements HasComponents, HasStyle {
     public AutomaticBid() {
         constructUI();
 
-        imageContainer.add(new AuctionsViewCard("Snow mountains under stars",
-                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-
     }
 
     private void constructUI() {

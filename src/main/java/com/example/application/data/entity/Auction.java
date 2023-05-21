@@ -2,15 +2,19 @@ package com.example.application.data.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Table
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 public class Auction {
 
     @Id
-    @SequenceGenerator(name = "auctionidgenerator", initialValue = 1000, allocationSize = 1)
+    @SequenceGenerator(name = "auctionidgenerator", initialValue = 10000, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "auctionidgenerator")
     private Long id;
 
@@ -18,32 +22,17 @@ public class Auction {
     private String title;
 
     private String description;
-    private int startingPrice;
+
+    private double startingPrice;
     private int currentPrice;
     private long lastBidderId;
+    private String username;
 
-    public Auction() {
 
-    }
-
-    public Auction(String title, String description, int startingPrice, int currentPrice, long lastBidderId) {
+    public Auction(String title, String description, double startingPrice, String username) {
         this.title = title;
         this.description = description;
         this.startingPrice = startingPrice;
-        this.currentPrice = currentPrice;
-        this.lastBidderId = lastBidderId;
+        this.username = username;
     }
-
-    @Override
-    public String toString() {
-        return "Auction{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", startingPrice=" + startingPrice +
-                ", currentPrice=" + currentPrice +
-                ", lastBidderId=" + lastBidderId +
-                '}';
-    }
-
 }

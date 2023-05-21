@@ -26,6 +26,9 @@ public class UserService {
     public Optional<Users> findByUsername(String username){
         return userRepository.findByUsername(username);
     }
+    public Optional<Users> findByEmail(String email){
+        return userRepository.findByEmail(email);
+    }
 
     public Users saveUser(Users user){
         return userRepository.save(user);

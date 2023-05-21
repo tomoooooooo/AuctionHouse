@@ -48,29 +48,6 @@ public class Users{
         this.userRole = userRole;
     }
 
-
-
-    public void addToDb() throws SQLException {
-        try {
-            Connection conn = dbConnect.connect();
-            PreparedStatement ps = null;
-            String sql = "INSERT INTO USERS (id, first_name, last_name, email, username, password, user_role) VALUES(?, ?, ?, ?, ?, ?, ?)";
-            ps = conn.prepareStatement(sql);
-            ps.setLong(1, 100);
-            ps.setString(2, firstName);
-            ps.setString(3, lastName);
-            ps.setString(4, email);
-            ps.setString(5, username);
-            ps.setString(6, password);
-            ps.setString(7, userRole.toString());
-            ps.execute();
-            ps.close();
-            conn.close();
-        }catch(SQLException e){
-            System.out.println(e.toString());
-        }
-    }
-
     @Override
     public String toString() {
         return "Users{" +

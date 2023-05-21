@@ -5,6 +5,7 @@ import com.example.application.data.repository.AuctionRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AuctionService {
@@ -26,5 +27,9 @@ public class AuctionService {
     public void save(Auction auction){
         if(auction != null)
             auctionRepository.save(auction);
+    }
+
+    public List<Auction> findByUsername(String username){
+        return auctionRepository.findByUsername(username);
     }
 }
