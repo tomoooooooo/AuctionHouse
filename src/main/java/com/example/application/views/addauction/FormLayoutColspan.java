@@ -23,6 +23,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 @Route("form-layout-colspan")
@@ -56,17 +57,21 @@ public class FormLayoutColspan extends Div {
         description.setValue("Add your description here!!");
 
         MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-        Upload upload = new Upload(buffer);
+        Upload image = new Upload(buffer);
+        Auction auction = new Auction();
 
-        upload.addSucceededListener(event -> {
+        image.addSucceededListener(event -> {
             String fileName = event.getFileName();
             InputStream inputStream = buffer.getInputStream(fileName);
-
+            try {
+                auction.setImage(inputStream.readAllBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             // Do something with the file data
             // processFile(inputStream, fileName);
         });
-        upload.setAcceptedFileTypes(".png");
-
+        image.setAcceptedFileTypes(".png", ".jpg");
 
         DatePicker dateFrom = new DatePicker("Date from");
 
@@ -111,12 +116,11 @@ public class FormLayoutColspan extends Div {
                 //Actually adding auction to db
                 UserDetails user = securityService.getAuthenticatedUser();
 
-                Auction auction = new Auction(
-                        title.getValue(),
-                        description.getValue(),
-                        euroField.getValue(),
-                        user.getUsername()
-                );
+                auction.setDescription(description.getValue());
+                auction.setTitle(title.getValue());
+                auction.setStartingPrice(euroField.getValue());
+                auction.setUsername(user.getUsername());
+
                 auctionRepository.save(auction);
 
                 Notification notification = Notification
@@ -141,11 +145,11 @@ public class FormLayoutColspan extends Div {
 
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(title, description, upload, dateFrom, from, dateTo, to, euroField, submitButton);
+        formLayout.add(title, description, image, dateFrom, from, dateTo, to, euroField, submitButton);
         // tag::snippet[]
         formLayout.setColspan(title, 3);
         formLayout.setColspan(description, 3);
-        formLayout.setColspan(upload, 3);
+        formLayout.setColspan(image, 3);
         formLayout.setColspan(from, 2);
         formLayout.setColspan(to, 2);
         formLayout.setColspan(submitButton, 3);

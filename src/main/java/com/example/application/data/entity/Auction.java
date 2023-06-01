@@ -27,6 +27,7 @@ public class Auction {
     private int currentPrice;
     private long lastBidderId;
     private String username;
+    private byte[] image;
 
 
     public Auction(String title, String description, double startingPrice, String username) {

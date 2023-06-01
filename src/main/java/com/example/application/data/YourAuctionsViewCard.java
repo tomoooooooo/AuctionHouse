@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Background;
 import com.vaadin.flow.theme.lumo.LumoUtility.BorderRadius;
@@ -26,6 +27,9 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Overflow;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class YourAuctionsViewCard extends ListItem {
 
@@ -48,8 +52,12 @@ public class YourAuctionsViewCard extends ListItem {
                 Margin.Bottom.MEDIUM, Overflow.HIDDEN, BorderRadius.MEDIUM, Width.FULL);
         div.setHeight("160px");
 
-        Image image = new Image();
 
+        InputStream imageStream = new ByteArrayInputStream(auction.getImage());
+        StreamResource imageResource = new StreamResource("StreamedImage",
+                () -> imageStream);
+        Image image = new Image(imageResource, "Image");
+        image.setWidth("100%");
         //image.setSrc(url);
         image.setAlt("No image");
 
