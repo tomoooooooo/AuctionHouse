@@ -30,10 +30,11 @@ public class Auction {
     private byte[] image;
 
 
-    public Auction(String title, String description, double startingPrice, String username) {
+    public Auction(String title, String description, double startingPrice, String username, byte[] image) {
         this.title = title;
         this.description = description;
         this.startingPrice = startingPrice;
         this.username = username;
+        this.image = image;
     }
 }

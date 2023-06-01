@@ -62,7 +62,7 @@ public class AuctionsViewCard extends ListItem {
 
         Button view = new Button("View!");
         view.addClickListener(e -> {
-            UI.getCurrent().navigate("auctionItem");
+            UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });
 
         add(div, header, subtitle, description, view);

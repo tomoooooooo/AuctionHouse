@@ -1,6 +1,7 @@
 package com.example.application.views.AuctionItem;
 
-import com.example.application.views.MainLayout;
+import com.example.application.data.entity.Auction;
+import com.example.application.data.services.AuctionService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -10,38 +11,79 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
+import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import jakarta.annotation.security.PermitAll;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.List;
 
 @PageTitle("Auction Item")
 @Route(value = "auctionItem/")
 @PermitAll
 
-public class AuctionItem extends VerticalLayout {
-    public AuctionItem() {
+public class AuctionItem extends VerticalLayout implements HasUrlParameter<String> {
+
+    private final AuctionService auctionService;
+    private H1 header;
+    private List<Auction> auctionsList;
+    private Auction auction;
+    private Image img;
+    private H4 description;
+    private TextArea details;
+
+    @Override
+    public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
+        for(Auction a : auctionsList)
+            if(a.getId() == Long.parseLong(parameter))
+                auction = new Auction(
+                        a.getTitle(),
+                        a.getDescription(),
+                        a.getStartingPrice(),
+                        a.getUsername(),
+                        a.getImage()
+                );
+        header.setText("Title: " + auction.getTitle());
+
+        InputStream imageStream = new ByteArrayInputStream(auction.getImage());
+        StreamResource imageResource = new StreamResource("StreamedImage",
+                () -> imageStream);
+        img.setSrc(imageResource);
+        img.setAlt("No image found :(");
+
+        description.setText(auction.getDescription());
+        details.setValue("Starting date: X  Starting hour: Y\n" +
+                "Ending date: X  Ending hour: Y\n" +
+                "Starting price: " + auction.getStartingPrice() + "\n" +
+                "Last Bid: n/a");
+    }
+
+
+    public AuctionItem(AuctionService auctionService) {
+        this.auctionService = auctionService;
+        auctionsList = auctionService.findAll();
         setSpacing(true);
 
-        H1 header = new H1("Item Title");
+        header = new H1();
         header.addClassNames(Margin.Top.LARGE, Margin.Bottom.SMALL);
         add(header);
 
-        Image img = new Image("images/empty-plant.png", "placeholder plant");
+      /*
+        Image image = new Image(, "Image");
+       */
+        img = new Image();
         img.setWidth("200px");
         add(img);
 
-        H4 description = new H4("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+        description = new H4();
         add(description);
 
-        TextArea details = new TextArea();
+        details = new TextArea();
         details.setReadOnly(true);
         details.setLabel("Auction details");
-        details.setValue("Starting date: X  Starting hour: Y\nEnding date: X  Ending hour: Y\nMinimum accepted price: Z\nStarting price: 50% of minimum accepted price\nLast Bid: n/a");
         details.setWidthFull();
 
         TextField status = new TextField();
@@ -102,4 +144,6 @@ public class AuctionItem extends VerticalLayout {
         getStyle().set("text-align", "center");
 
     }
+
+
 }

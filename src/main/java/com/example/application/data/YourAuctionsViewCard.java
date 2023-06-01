@@ -78,7 +78,7 @@ public class YourAuctionsViewCard extends ListItem {
 
         Button view = new Button("View!");
         view.addClickListener(e -> {
-            UI.getCurrent().navigate("auctionItem");
+            UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });
 
         Button delete = new Button("Delete");
