@@ -25,6 +25,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Route("form-layout-colspan")
 public class FormLayoutColspan extends Div {
@@ -56,6 +59,8 @@ public class FormLayoutColspan extends Div {
         });
         description.setValue("Add your description here!!");
 
+
+        //Image input ----------------------------------------------------------
         MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
         Upload image = new Upload(buffer);
         Auction auction = new Auction();
@@ -68,18 +73,76 @@ public class FormLayoutColspan extends Div {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            // Do something with the file data
-            // processFile(inputStream, fileName);
         });
         image.setAcceptedFileTypes(".png", ".jpg");
 
+
+        //Date input and validation---------------------------------------------
+        LocalDate now = LocalDate.now(ZoneId.systemDefault());
+
         DatePicker dateFrom = new DatePicker("Date from");
-
-        TimePicker from = new TimePicker("From");
-
+        dateFrom.setMin(now);
+        dateFrom.setValue(now);
         DatePicker dateTo = new DatePicker("Date to");
+        dateTo.setMin(now);
 
-        TimePicker to = new TimePicker("To");
+        TimePicker fromTP = new TimePicker("From");
+        LocalTime nowTime = LocalTime.now();
+        //fromTP.setMin(nowTime);
+
+        TimePicker toTP = new TimePicker("To");
+        toTP.setMin(nowTime);
+
+
+        dateFrom.addValueChangeListener(event -> {
+            LocalDate dateFromLD = dateFrom.getValue();
+            if(dateFromLD != null)
+                dateTo.setMin(dateFromLD);
+        });
+
+        dateTo.addValueChangeListener(event -> {
+            LocalDate dateToValue = dateTo.getValue();
+            LocalDate dateFromValue = dateFrom.getValue();
+            if(dateToValue != null) {
+                if (dateFromValue.isAfter(dateToValue)) {
+                    dateTo.setValue(dateFromValue);
+                }
+                if (dateFromValue.isBefore(dateToValue))
+                    toTP.setMin(LocalTime.of(0, 0));
+                else if (dateFromValue.isEqual(dateToValue)) {
+                    fromTP.setMin(nowTime);
+                    if (fromTP.getValue() != null)
+                        toTP.setMin(fromTP.getValue().plusHours(1));
+                }
+            }
+        });
+
+        fromTP.addValueChangeListener(event -> {
+            LocalTime fromTpValue = fromTP.getValue();
+            LocalTime toTpValue = toTP.getValue();
+            if(fromTpValue != null && dateFrom.getValue() != null && dateTo.getValue() != null)
+                if(dateFrom.getValue().isEqual(dateTo.getValue()))
+                    toTP.setMin(fromTpValue.plusHours(1));
+            if(toTpValue != null)
+                if(fromTpValue.isAfter(toTpValue))
+                    toTP.setValue(fromTpValue.plusHours(1));
+        });
+
+
+        toTP.addValueChangeListener(event -> {
+            LocalTime fromTpValue = fromTP.getValue();
+            LocalTime toTpValue = toTP.getValue();
+            if(fromTpValue != null && toTpValue != null && dateFrom.getValue() != null && dateTo.getValue() != null)
+                if(dateFrom.getValue().isEqual(dateTo.getValue()))
+                    if(fromTpValue.plusHours(1).isAfter(toTpValue))
+                        toTP.setValue(fromTpValue.plusHours(1));
+
+        });
+
+
+
+
+
 
         NumberField euroField = new NumberField();
         euroField.setLabel("Minimum accepted price:");
@@ -119,7 +182,11 @@ public class FormLayoutColspan extends Div {
                 auction.setDescription(description.getValue());
                 auction.setTitle(title.getValue());
                 auction.setStartingPrice(euroField.getValue());
-                auction.setUsername(user.getUsername());
+                auction.setAuctionerUsername(user.getUsername());
+                auction.setFromLD(dateFrom.getValue());
+                auction.setFromLT(fromTP.getValue());
+                auction.setToLD(dateTo.getValue());
+                auction.setToLT(toTP.getValue());
 
                 auctionRepository.save(auction);
 
@@ -145,13 +212,13 @@ public class FormLayoutColspan extends Div {
 
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(title, description, image, dateFrom, from, dateTo, to, euroField, submitButton);
+        formLayout.add(title, description, image, dateFrom, fromTP, dateTo, toTP, euroField, submitButton);
         // tag::snippet[]
         formLayout.setColspan(title, 3);
         formLayout.setColspan(description, 3);
         formLayout.setColspan(image, 3);
-        formLayout.setColspan(from, 2);
-        formLayout.setColspan(to, 2);
+        formLayout.setColspan(fromTP, 2);
+        formLayout.setColspan(toTP, 2);
         formLayout.setColspan(submitButton, 3);
 
 

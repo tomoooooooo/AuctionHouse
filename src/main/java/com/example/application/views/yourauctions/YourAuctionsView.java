@@ -39,6 +39,7 @@ public class YourAuctionsView extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
     private List<Auction> auctions;
+    private Select<String> sortBy;
 
     public YourAuctionsView(AuctionService auctionService, SecurityService securityService) {
         this.auctionService = auctionService;
@@ -51,6 +52,26 @@ public class YourAuctionsView extends Main implements HasComponents, HasStyle {
         {
             imageContainer.add(new YourAuctionsViewCard(a, auctionService));
         }
+
+        sortBy.addValueChangeListener(event -> {
+            if(event.getValue().equals("Newest first")) {
+                auctions = auctionService.listSortedByNewest();
+                imageContainer.removeAll();
+                for(Auction a : auctions)
+                {
+                    if(a.getAuctionerUsername().equals(securityService.getAuthenticatedUser().getUsername()))
+                        imageContainer.add(new YourAuctionsViewCard(a, auctionService));
+                }
+            }
+            else if(event.getValue().equals("Oldest first")) {
+                imageContainer.removeAll();
+                auctions = auctionService.listSortedByOldest();
+                for (Auction a : auctions) {
+                    if(a.getAuctionerUsername().equals(securityService.getAuthenticatedUser().getUsername()))
+                        imageContainer.add(new YourAuctionsViewCard(a, auctionService));
+                }
+            }
+        });
 
     }
 
@@ -68,7 +89,7 @@ public class YourAuctionsView extends Main implements HasComponents, HasStyle {
         description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
 
-        Select<String> sortBy = new Select<>();
+        sortBy = new Select<>();
         sortBy.setLabel("Sort by");
         sortBy.setItems("Newest first", "Oldest first");
         sortBy.setValue("Newest first");

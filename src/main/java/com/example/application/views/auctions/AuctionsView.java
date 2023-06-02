@@ -38,6 +38,7 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
 
     private OrderedList imageContainer;
     private List<Auction> auctions;
+    Select<String> sortBy;
 
     public AuctionsView(AuctionService auctionService) {
         this.auctionService = auctionService;
@@ -49,6 +50,25 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
         {
             imageContainer.add(new AuctionsViewCard(a));
         }
+
+
+        sortBy.addValueChangeListener(event -> {
+            if(event.getValue().equals("Newest first")) {
+                auctions = auctionService.listSortedByNewest();
+                imageContainer.removeAll();
+                for(Auction a : auctions)
+                {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+            else if(event.getValue().equals("Oldest first")) {
+                imageContainer.removeAll();
+                auctions = auctionService.listSortedByOldest();
+                for (Auction a : auctions) {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+        });
     }
 
     private void constructUI() {
@@ -65,16 +85,16 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
         description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
 
-        Select<String> sortBy = new Select<>();
+        sortBy = new Select<>();
         sortBy.setLabel("Sort by");
-        sortBy.setItems("Popularity", "Newest first", "Oldest first");
-        sortBy.setValue("Popularity");
+        sortBy.setItems("Newest first", "Oldest first");
+        sortBy.setValue("Newest first");
+
 
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);
 
         container.add(headerContainer, sortBy);
         add(container, imageContainer);
-
     }
 }

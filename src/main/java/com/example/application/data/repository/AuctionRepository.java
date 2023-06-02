@@ -8,5 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
-    List<Auction> findByUsername(String username);
+    List<Auction> findByAuctionerUsername(String auctionerUsername);
 }
