@@ -1,8 +1,10 @@
 package com.example.application.views.favoriteauctions;
 
 import com.example.application.data.AuctionsViewCard;
-import com.example.application.data.YourAuctionsViewCard;
 import com.example.application.data.entity.Auction;
+import com.example.application.data.services.AuctionService;
+import com.example.application.data.services.FavouriteService;
+import com.example.application.security.SecurityService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
@@ -27,15 +29,53 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
 
+import java.util.List;
+
 @PageTitle("Favorite auctions")
 @Route(value = "favorite", layout = MainLayout.class)
 @PermitAll
 public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
 
-    private OrderedList imageContainer;
+    private final FavouriteService favouriteService;
+    private final SecurityService securityService;
+    private final AuctionService auctionService;
 
-    public FavoriteAuctions() {
+    private List<Auction> auctions;
+
+    private OrderedList imageContainer;
+    private Select<String> sortBy;
+
+    public FavoriteAuctions(FavouriteService favouriteService, SecurityService securityService, AuctionService auctionService) {
+        this.favouriteService = favouriteService;
+        this.securityService = securityService;
+        this.auctionService = auctionService;
+
+
         constructUI();
+
+        auctions = favouriteService.findAll(securityService.getAuthenticatedUser().getUsername());
+
+        for(Auction a : auctions){
+            imageContainer.add(new AuctionsViewCard(a));
+        }
+
+        sortBy.addValueChangeListener(event -> {
+            if(event.getValue().equals("Newest first")) {
+                auctions = this.auctionService.listSortedByNewest(auctions);
+                imageContainer.removeAll();
+                for(Auction a : auctions)
+                {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+            else if(event.getValue().equals("Oldest first")) {
+                imageContainer.removeAll();
+                auctions = this.auctionService.listSortedByOldest(auctions);
+                for (Auction a : auctions) {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+        });
 
     }
 
@@ -53,10 +93,10 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
         description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
 
-        Select<String> sortBy = new Select<>();
+        sortBy = new Select<>();
         sortBy.setLabel("Sort by");
-        sortBy.setItems("Popularity", "Newest first", "Oldest first");
-        sortBy.setValue("Popularity");
+        sortBy.setItems("Newest first", "Oldest first");
+        sortBy.setValue("Newest first");
 
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);

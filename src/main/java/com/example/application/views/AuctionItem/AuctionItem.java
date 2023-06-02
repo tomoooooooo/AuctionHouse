@@ -1,7 +1,9 @@
 package com.example.application.views.AuctionItem;
 
 import com.example.application.data.entity.Auction;
+import com.example.application.data.entity.Favourite;
 import com.example.application.data.services.AuctionService;
+import com.example.application.data.services.FavouriteService;
 import com.example.application.security.SecurityService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -31,6 +33,7 @@ import java.util.List;
 public class AuctionItem extends VerticalLayout implements HasUrlParameter<String> {
 
     private final AuctionService auctionService;
+    private final FavouriteService favouriteService;
     private final SecurityService securityService;
     private H1 header;
     private List<Auction> auctionsList;
@@ -41,6 +44,7 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
     private TextField status;
     private NumberField euroField;
     private Button bid;
+    private Button favorite;
     private Notification notification;
 
     @Override
@@ -121,14 +125,31 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
                             "Last Bid: " + auction.getCurrentPrice());
                 }
             }
+        });
 
+        Favourite favouriteOffer = favouriteService.findByUsernameAndAuctionId(securityService.getAuthenticatedUser().getUsername(), auction.getId());
+        if(favouriteOffer != null){
+            favorite.setText("Remove from Favourite!");
+        }
 
+        favorite.addClickListener(e ->{
+            if(favorite.getText().equals("Remove from Favourite!")){
+                Favourite favOffer = favouriteService.findByUsernameAndAuctionId(securityService.getAuthenticatedUser().getUsername(), auction.getId());
+                favouriteService.delete(favOffer);
+                notification = Notification.show("Removed from Favourite!");
+                favorite.setText("Add to Favourite!");
+            }else {
+                favouriteService.save(new Favourite(securityService.getAuthenticatedUser().getUsername(), auction.getId()));
+                notification = Notification.show("Added to Favourite!");
+                favorite.setText("Remove from Favourite!");
+            }
         });
     }
 
 
-    public AuctionItem(AuctionService auctionService, SecurityService securityService) {
+    public AuctionItem(AuctionService auctionService, FavouriteService favouriteService, SecurityService securityService) {
         this.auctionService = auctionService;
+        this.favouriteService = favouriteService;
         this.securityService = securityService;
 
 
@@ -161,11 +182,7 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
         status.setWidth("200px");
         status.setHeight("32px");
 
-        Button favorite = new Button("Add Favorite!");
-        favorite.addClickListener(e ->{
-            notification = Notification
-                    .show("Added to favorite!");
-        });
+        favorite = new Button("Add to Favourite!");
         favorite.getStyle().set("margin-top", "60px");
 
         HorizontalLayout horizontaldetails = new HorizontalLayout(details, status, favorite);

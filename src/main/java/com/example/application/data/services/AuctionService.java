@@ -22,8 +22,7 @@ public class AuctionService {
         return auctionRepository.findAll();
     }
 
-    public List<Auction> listSortedByOldest(){
-        List<Auction> auctions = auctionRepository.findAll();
+    public List<Auction> listSortedByOldest(List<Auction> auctions ){
 
         Collections.sort(auctions, new Comparator<Auction>() {
             public int compare(Auction a1, Auction a2) {
@@ -39,9 +38,7 @@ public class AuctionService {
         return auctions;
     }
 
-    public List<Auction> listSortedByNewest(){
-        List<Auction> auctions = auctionRepository.findAll();
-
+    public List<Auction> listSortedByNewest(List<Auction> auctions){
         Collections.sort(auctions, new Comparator<Auction>() {
             public int compare(Auction a1, Auction a2) {
                 if(a1.getFromLD().getYear() == a2.getFromLD().getYear())
@@ -76,7 +73,9 @@ public class AuctionService {
         }
     }
 
-
+    public Optional<Auction> findById(Long id){
+        return auctionRepository.findById(id);
+    }
 
     public List<Auction> findByUsername(String auctionerUsername){
         return auctionRepository.findByAuctionerUsername(auctionerUsername);

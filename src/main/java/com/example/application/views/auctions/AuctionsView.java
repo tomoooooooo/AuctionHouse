@@ -54,7 +54,7 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
 
         sortBy.addValueChangeListener(event -> {
             if(event.getValue().equals("Newest first")) {
-                auctions = auctionService.listSortedByNewest();
+                auctions = auctionService.listSortedByNewest(auctions);
                 imageContainer.removeAll();
                 for(Auction a : auctions)
                 {
@@ -63,7 +63,7 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
             }
             else if(event.getValue().equals("Oldest first")) {
                 imageContainer.removeAll();
-                auctions = auctionService.listSortedByOldest();
+                auctions = auctionService.listSortedByOldest(auctions);
                 for (Auction a : auctions) {
                     imageContainer.add(new AuctionsViewCard(a));
                 }
