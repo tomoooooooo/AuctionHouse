@@ -84,13 +84,16 @@ public class YourAuctionsView extends Main implements HasComponents, HasStyle {
 
         VerticalLayout headerContainer = new VerticalLayout();
         H2 header = new H2("Your Auction Items");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        header.addClassNames("header");
+        //header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
         Paragraph description = new Paragraph("Below you can find the items you added for auction.");
-        description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        description.addClassName("description");
+        //description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         headerContainer.add(header, description);
 
         sortBy = new Select<>();
         sortBy.setLabel("Sort by");
+        sortBy.setClassName("my-select");
         sortBy.setItems("Newest first", "Oldest first");
         sortBy.setValue("Newest first");
 

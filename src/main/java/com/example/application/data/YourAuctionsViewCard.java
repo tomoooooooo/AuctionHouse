@@ -45,7 +45,7 @@ public class YourAuctionsViewCard extends ListItem {
     public YourAuctionsViewCard(Auction auction, AuctionService auctionService) {
         this.auctionService = auctionService;
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
-                BorderRadius.LARGE);
+                BorderRadius.LARGE, "item");
 
         Div div = new Div();
         div.addClassNames(Background.CONTRAST, Display.FLEX, AlignItems.CENTER, JustifyContent.CENTER,
@@ -77,6 +77,7 @@ public class YourAuctionsViewCard extends ListItem {
         description.addClassName(Margin.Vertical.MEDIUM);
 
         Button view = new Button("View!");
+        view.setClassName("item-button");
         view.addClickListener(e -> {
             UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });

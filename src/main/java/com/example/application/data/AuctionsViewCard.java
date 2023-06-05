@@ -30,7 +30,7 @@ public class AuctionsViewCard extends ListItem {
 
     public AuctionsViewCard(Auction auction) {
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
-                BorderRadius.LARGE);
+                BorderRadius.LARGE, "item");
 
         Div div = new Div();
         div.addClassNames(Background.CONTRAST, Display.FLEX, AlignItems.CENTER, JustifyContent.CENTER,
@@ -61,6 +61,7 @@ public class AuctionsViewCard extends ListItem {
 
 
         Button view = new Button("View!");
+        view.setClassName("item-button");
         view.addClickListener(e -> {
             UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });
