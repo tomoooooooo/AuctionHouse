@@ -88,13 +88,16 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
 
         VerticalLayout headerContainer = new VerticalLayout();
         H2 header = new H2("Favorite Auction Items");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        header.addClassNames("header");
+        //header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
         Paragraph description = new Paragraph("Here you can find the items added by you as favorites.");
-        description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        //description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        description.addClassName("description");
         headerContainer.add(header, description);
 
         sortBy = new Select<>();
         sortBy.setLabel("Sort by");
+        sortBy.setClassName("my-select");
         sortBy.setItems("Newest first", "Oldest first");
         sortBy.setValue("Newest first");
 

@@ -152,6 +152,7 @@ public class FormLayoutColspan extends Div {
         euroField.setSuffixComponent(euroSuffix);
 
         Button submitButton = new Button("Submit");
+        submitButton.setClassName("add-auction-button");
         submitButton.addClickListener(e -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(FlexComponent.Alignment.CENTER);

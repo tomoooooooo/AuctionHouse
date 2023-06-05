@@ -6,13 +6,11 @@ import com.example.application.data.services.AuctionService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Main;
-import com.vaadin.flow.component.html.OrderedList;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -80,13 +78,21 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
 
         VerticalLayout headerContainer = new VerticalLayout();
         H2 header = new H2("Auction Items");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        header.addClassNames("header");
         Paragraph description = new Paragraph("Here you can find the items added for auction!");
-        description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        description.addClassName("description");
         headerContainer.add(header, description);
+
+        HorizontalLayout container2 = new HorizontalLayout();
+        container2.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
+
+        Label selectLabel = new Label("Sort by");
+        selectLabel.addClassName("label");
+        container2.add(selectLabel);
 
         sortBy = new Select<>();
         sortBy.setLabel("Sort by");
+        sortBy.setClassName("my-select");
         sortBy.setItems("Newest first", "Oldest first");
         sortBy.setValue("Newest first");
 
@@ -94,7 +100,7 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);
 
-        container.add(headerContainer, sortBy);
+        container.add(headerContainer, container2, sortBy);
         add(container, imageContainer);
     }
 }
