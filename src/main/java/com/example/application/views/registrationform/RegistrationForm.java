@@ -2,6 +2,7 @@ package com.example.application.views.registrationform;
 
 import com.example.application.data.entity.UserRole;
 import com.example.application.data.entity.Users;
+import com.example.application.data.services.UserService;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -10,19 +11,21 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-import java.sql.SQLException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Getter
 @Setter
 public class RegistrationForm extends FormLayout{
+
+    private final UserService userService;
 
     private H3 title;
     private TextField firstName;
@@ -36,7 +39,9 @@ public class RegistrationForm extends FormLayout{
     private Button submitButton;
 
 
-    public RegistrationForm(){
+
+    public RegistrationForm(UserService userService){
+        this.userService = userService;
         setSizeFull();
         title = new H3("Signup form");
         firstName = new TextField("First name");
@@ -61,12 +66,16 @@ public class RegistrationForm extends FormLayout{
                     password.getValue(),
                     UserRole.USER
             );
-            try {
-                user.addToDb();
-                UI.getCurrent().navigate("");
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+            Optional<Users> uUsername = userService.findByUsername(userName.getValue());
+            Optional<Users> uEmail = userService.findByEmail(email.getValue());
+            if(uUsername.isPresent() || uEmail.isPresent()) {
+                Notification notification = Notification.show("User with email or username already exists!");
             }
+            else{
+                userService.saveUser(user);
+                UI.getCurrent().navigate("");
+            }
+
         });
 
         add(title, firstName, lastName, email, userName, password, passwordConfirm, errorMessageField, submitButton);

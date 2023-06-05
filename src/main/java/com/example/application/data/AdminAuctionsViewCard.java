@@ -31,18 +31,19 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class YourAuctionsViewCard extends ListItem {
+public class AdminAuctionsViewCard extends ListItem {
 
-    private final AuctionService auctionService;
+    private AuctionService auctionService;
 
     private Span status;
+    private Button accept, reject;
 
     private void setStatus(String value) {
         status.setText("Status: " + value);
         status.setVisible(true);
     };
 
-    public YourAuctionsViewCard(Auction auction, AuctionService auctionService) {
+    public AdminAuctionsViewCard(Auction auction, AuctionService auctionService) {
         this.auctionService = auctionService;
         addClassNames(Background.CONTRAST_5, Display.FLEX, FlexDirection.COLUMN, AlignItems.START, Padding.MEDIUM,
                 BorderRadius.LARGE, "item");
@@ -82,9 +83,9 @@ public class YourAuctionsViewCard extends ListItem {
             UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });
 
-        Button delete = new Button("Delete");
-        delete.getStyle().set("background-color", "red");
-        delete.addClickListener(e -> {
+        accept = new Button("Accept");
+        accept.getStyle().set("background-color", "green");
+        accept.addClickListener(e -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -93,7 +94,44 @@ public class YourAuctionsViewCard extends ListItem {
             status.setVisible(false);
 
             ConfirmDialog dialog = new ConfirmDialog();
-            dialog.setHeader("Are you sure you want delete the selected item?");
+            dialog.setHeader("Are you sure you want accept the selected item?");
+            dialog.setText("You cannot undo the action!");
+
+
+            dialog.setRejectable(true);
+            dialog.setRejectText("Discard");
+            dialog.addRejectListener(event -> {
+                setStatus("Discarded");
+                Notification notification = Notification.show("Discarded");
+            });
+
+            dialog.setConfirmText("Accept");
+            dialog.addConfirmListener(event -> {
+                auction.setAccepted("accepted");
+                auctionService.update(auction);
+                setStatus("Accepted");
+                Notification notification = Notification.show("Item accepted");
+            });
+
+
+            dialog.open();
+
+            add(layout);
+
+
+        });
+        reject = new Button("Reject");
+        reject.getStyle().set("background-color", "red");
+        reject.addClickListener(e -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            layout.setAlignItems(FlexComponent.Alignment.CENTER);
+            layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+
+            status = new Span();
+            status.setVisible(false);
+
+            ConfirmDialog dialog = new ConfirmDialog();
+            dialog.setHeader("Are you sure you want reject the selected item?");
             dialog.setText("You cannot undo the action!");
 
 
@@ -105,12 +143,13 @@ public class YourAuctionsViewCard extends ListItem {
                         .show("Discarded");
             });
 
-            dialog.setConfirmText("Delete");
+            dialog.setConfirmText("Reject");
             dialog.addConfirmListener(event -> {
-                auctionService.delete(auction);
-                setStatus("Deleted");
+                auction.setAccepted("rejected");
+                auctionService.update(auction);
+                setStatus("Rejected");
                 Notification notification = Notification
-                        .show("Item deleted");
+                        .show("Item rejected");
             });
 
 
@@ -120,13 +159,8 @@ public class YourAuctionsViewCard extends ListItem {
 
 
         });
-        Button edit = new Button("Edit");
-        edit.addClickListener(e -> {
-            UI.getCurrent().navigate("edit/"+auction.getId());
-        });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(view, delete, edit
-        );
+        HorizontalLayout horizontalLayout = new HorizontalLayout(view, accept, reject);
         add(horizontalLayout);
 
         add(div, header, subtitle, description, horizontalLayout);

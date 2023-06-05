@@ -1,6 +1,8 @@
 package com.example.application.views.addauction;
 
-import com.vaadin.flow.component.UI;
+import com.example.application.data.entity.Auction;
+import com.example.application.data.repository.AuctionRepository;
+import com.example.application.security.SecurityService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -18,16 +20,20 @@ import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.Route;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 
 @Route("form-layout-colspan")
 public class FormLayoutColspan extends Div {
 
+    private final AuctionRepository auctionRepository;
+    private final SecurityService securityService;
 
     int charLimit = 140;
     private Span status;
@@ -36,41 +42,107 @@ public class FormLayoutColspan extends Div {
         status.setText("Status: " + value);
         status.setVisible(true);
     };
-    public FormLayoutColspan(){
+    public FormLayoutColspan(AuctionRepository auctionRepository, SecurityService securityService){
+        this.auctionRepository = auctionRepository;
+        this.securityService = securityService;
 
         TextField title = new TextField("Title");
 
 
-        TextArea textArea = new TextArea();
-        textArea.setLabel("Description");
-        textArea.setMaxLength(charLimit);
-        textArea.setValueChangeMode(ValueChangeMode.EAGER);
-        textArea.addValueChangeListener(e -> {
+        TextArea description = new TextArea();
+        description.setLabel("Description");
+        description.setMaxLength(charLimit);
+        description.setValueChangeMode(ValueChangeMode.EAGER);
+        description.addValueChangeListener(e -> {
             e.getSource()
                     .setHelperText(e.getValue().length() + "/" + charLimit);
         });
-        textArea.setValue("Add your description here!!");
+        description.setValue("Add your description here!!");
 
+
+        //Image input ----------------------------------------------------------
         MultiFileMemoryBuffer buffer = new MultiFileMemoryBuffer();
-        Upload upload = new Upload(buffer);
+        Upload image = new Upload(buffer);
+        Auction auction = new Auction();
 
-        upload.addSucceededListener(event -> {
+        image.addSucceededListener(event -> {
             String fileName = event.getFileName();
             InputStream inputStream = buffer.getInputStream(fileName);
-
-            // Do something with the file data
-            // processFile(inputStream, fileName);
+            try {
+                auction.setImage(inputStream.readAllBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
-        upload.setAcceptedFileTypes(".png");
+        image.setAcceptedFileTypes(".png", ".jpg");
 
+
+        //Date input and validation---------------------------------------------
+        LocalDate now = LocalDate.now(ZoneId.systemDefault());
 
         DatePicker dateFrom = new DatePicker("Date from");
-
-        TimePicker from = new TimePicker("From");
-
+        dateFrom.setMin(now);
+        dateFrom.setValue(now);
         DatePicker dateTo = new DatePicker("Date to");
+        dateTo.setMin(now);
 
-        TimePicker to = new TimePicker("To");
+        TimePicker fromTP = new TimePicker("From");
+        LocalTime nowTime = LocalTime.now();
+        //fromTP.setMin(nowTime);
+
+        TimePicker toTP = new TimePicker("To");
+        toTP.setMin(nowTime);
+
+
+        dateFrom.addValueChangeListener(event -> {
+            LocalDate dateFromLD = dateFrom.getValue();
+            if(dateFromLD != null)
+                dateTo.setMin(dateFromLD);
+        });
+
+        dateTo.addValueChangeListener(event -> {
+            LocalDate dateToValue = dateTo.getValue();
+            LocalDate dateFromValue = dateFrom.getValue();
+            if(dateToValue != null) {
+                if (dateFromValue.isAfter(dateToValue)) {
+                    dateTo.setValue(dateFromValue);
+                }
+                if (dateFromValue.isBefore(dateToValue))
+                    toTP.setMin(LocalTime.of(0, 0));
+                else if (dateFromValue.isEqual(dateToValue)) {
+                    fromTP.setMin(nowTime);
+                    if (fromTP.getValue() != null)
+                        toTP.setMin(fromTP.getValue().plusHours(1));
+                }
+            }
+        });
+
+        fromTP.addValueChangeListener(event -> {
+            LocalTime fromTpValue = fromTP.getValue();
+            LocalTime toTpValue = toTP.getValue();
+            if(fromTpValue != null && dateFrom.getValue() != null && dateTo.getValue() != null)
+                if(dateFrom.getValue().isEqual(dateTo.getValue()))
+                    toTP.setMin(fromTpValue.plusHours(1));
+            if(toTpValue != null)
+                if(fromTpValue.isAfter(toTpValue))
+                    toTP.setValue(fromTpValue.plusHours(1));
+        });
+
+
+        toTP.addValueChangeListener(event -> {
+            LocalTime fromTpValue = fromTP.getValue();
+            LocalTime toTpValue = toTP.getValue();
+            if(fromTpValue != null && toTpValue != null && dateFrom.getValue() != null && dateTo.getValue() != null)
+                if(dateFrom.getValue().isEqual(dateTo.getValue()))
+                    if(fromTpValue.plusHours(1).isAfter(toTpValue))
+                        toTP.setValue(fromTpValue.plusHours(1));
+
+        });
+
+
+
+
+
 
         NumberField euroField = new NumberField();
         euroField.setLabel("Minimum accepted price:");
@@ -80,6 +152,7 @@ public class FormLayoutColspan extends Div {
         euroField.setSuffixComponent(euroSuffix);
 
         Button submitButton = new Button("Submit");
+        submitButton.setClassName("add-auction-button");
         submitButton.addClickListener(e -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -90,9 +163,7 @@ public class FormLayoutColspan extends Div {
 
             ConfirmDialog dialog = new ConfirmDialog();
             dialog.setHeader("Are you sure you want to submit?");
-            dialog.setText(
-                    "Please check if all the introduced data is correct.");
-
+            dialog.setText("Please check if all the introduced data is correct.");
 
             dialog.setRejectable(true);
             dialog.setRejectText("Discard");
@@ -105,6 +176,23 @@ public class FormLayoutColspan extends Div {
             dialog.setConfirmText("Save");
             dialog.addConfirmListener(event -> {
                 setStatus("Submit");
+
+                //Actually adding auction to db
+                UserDetails user = securityService.getAuthenticatedUser();
+
+                auction.setDescription(description.getValue());
+                auction.setTitle(title.getValue());
+                auction.setStartingPrice(euroField.getValue());
+                auction.setAuctionerUsername(user.getUsername());
+                auction.setFromLD(dateFrom.getValue());
+                auction.setFromLT(fromTP.getValue());
+                auction.setToLD(dateTo.getValue());
+                auction.setToLT(toTP.getValue());
+                auction.setLastBidderUsername("");
+                auction.setAccepted("waiting");
+
+                auctionRepository.save(auction);
+
                 Notification notification = Notification
                         .show("Item added");
             });
@@ -127,13 +215,13 @@ public class FormLayoutColspan extends Div {
 
 
         FormLayout formLayout = new FormLayout();
-        formLayout.add(title, textArea, upload, dateFrom, from, dateTo, to, euroField, submitButton);
+        formLayout.add(title, description, image, dateFrom, fromTP, dateTo, toTP, euroField, submitButton);
         // tag::snippet[]
         formLayout.setColspan(title, 3);
-        formLayout.setColspan(textArea, 3);
-        formLayout.setColspan(upload, 3);
-        formLayout.setColspan(from, 2);
-        formLayout.setColspan(to, 2);
+        formLayout.setColspan(description, 3);
+        formLayout.setColspan(image, 3);
+        formLayout.setColspan(fromTP, 2);
+        formLayout.setColspan(toTP, 2);
         formLayout.setColspan(submitButton, 3);
 
 

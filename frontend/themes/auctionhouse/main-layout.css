@@ -14,3 +14,95 @@ vaadin-scroller[slot="drawer"] {
 [slot="drawer"]:is(header, footer):is(:empty) {
   display: none;
 }
+
+.header {
+  font-family: 'Arial', sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+  color: bisque;
+}
+
+.description{
+  font-family: 'Times New Roman';
+  font-size: 20px;
+  font-weight: lighter;
+  color:bisque;
+}
+
+.my-select {
+  width: 300px;
+  border: 1px solid cadetblue;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: Arial;
+  font-size: 17px;
+  color: red;
+}
+
+.my-select .v-select-option.v-filter-selected {
+  background-color: red;
+  color: red;
+}
+
+.my-select .vaadin-select-text {
+  color: red; /* Set the desired color */
+}
+
+.my-select .vaadin-select-overlay .vaadin-combo-box-item {
+  color: blue; /* Set the desired color */
+  background-color: black;
+}
+
+.my-select .v-select-option:hover {
+  background-color: red;
+}
+
+.label{
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+
+
+body {
+  background-image: url('https://wallpaper-mania.com/wp-content/uploads/2018/09/High_resolution_wallpaper_background_ID_77700320754-optimized.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.nav-item{
+  color: bisque;
+  border-bottom: 5px;
+}
+
+.nav-item:hover {
+  background-color: gray;
+}
+
+.nav{
+  background-color: darkkhaki;
+  font-weight: lighter;
+}
+
+.add-auction-item{
+  color: #333333;
+}
+
+.add-auction-button{
+  background-color: lightskyblue;
+  color: #333333;
+  font-size: 20px;
+}
+
+.item{
+  background-color: darkslategrey;
+}
+
+
+.item-button{
+  background-color: #cccccc;
+  color: #333333;
+}

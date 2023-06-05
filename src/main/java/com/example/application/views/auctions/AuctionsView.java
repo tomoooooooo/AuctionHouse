@@ -1,18 +1,19 @@
 package com.example.application.views.auctions;
 
 import com.example.application.data.AuctionsViewCard;
+import com.example.application.data.entity.Auction;
+import com.example.application.data.services.AuctionService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Main;
-import com.vaadin.flow.component.html.OrderedList;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
@@ -24,31 +25,53 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import jakarta.annotation.security.PermitAll;
+
+import java.util.List;
+import java.util.Objects;
 
 @PageTitle("Auctions")
 @Route(value = "", layout = MainLayout.class)
+
 @AnonymousAllowed
 public class AuctionsView extends Main implements HasComponents, HasStyle {
 
-    private OrderedList imageContainer;
+    private final AuctionService auctionService;
 
-    public AuctionsView() {
+    private OrderedList imageContainer;
+    private List<Auction> auctions;
+    Select<String> sortBy;
+
+    public AuctionsView(AuctionService auctionService) {
+        this.auctionService = auctionService;
         constructUI();
 
-        imageContainer.add(new AuctionsViewCard("Snow mountains under stars",
-                "https://images.unsplash.com/photo-1519681393784-d120267933ba?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new AuctionsViewCard("Snow covered mountain",
-                "https://images.unsplash.com/photo-1512273222628-4daea6e55abb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new AuctionsViewCard("River between mountains",
-                "https://images.unsplash.com/photo-1536048810607-3dc7f86981cb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80"));
-        imageContainer.add(new AuctionsViewCard("Milky way on mountains",
-                "https://images.unsplash.com/photo-1515705576963-95cad62945b6?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=750&q=80"));
-        imageContainer.add(new AuctionsViewCard("Mountain with fog",
-                "https://images.unsplash.com/photo-1513147122760-ad1d5bf68cdb?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"));
-        imageContainer.add(new AuctionsViewCard("Mountain at night",
-                "https://images.unsplash.com/photo-1562832135-14a35d25edef?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=815&q=80"));
 
+        auctions = auctionService.findAll();
+
+        for(Auction a : auctions)
+        {
+            if(Objects.equals(a.getAccepted(), "accepted"))
+                imageContainer.add(new AuctionsViewCard(a));
+        }
+
+
+        sortBy.addValueChangeListener(event -> {
+            if(event.getValue().equals("Newest first")) {
+                auctions = auctionService.listSortedByNewest(auctions);
+                imageContainer.removeAll();
+                for(Auction a : auctions)
+                {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+            else if(event.getValue().equals("Oldest first")) {
+                imageContainer.removeAll();
+                auctions = auctionService.listSortedByOldest(auctions);
+                for (Auction a : auctions) {
+                    imageContainer.add(new AuctionsViewCard(a));
+                }
+            }
+        });
     }
 
     private void constructUI() {
@@ -60,21 +83,29 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
 
         VerticalLayout headerContainer = new VerticalLayout();
         H2 header = new H2("Auction Items");
-        header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
+        header.addClassNames("header");
         Paragraph description = new Paragraph("Here you can find the items added for auction!");
-        description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        description.addClassName("description");
         headerContainer.add(header, description);
 
-        Select<String> sortBy = new Select<>();
+        HorizontalLayout container2 = new HorizontalLayout();
+        container2.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
+
+        Label selectLabel = new Label("Sort by");
+        selectLabel.addClassName("label");
+        container2.add(selectLabel);
+
+        sortBy = new Select<>();
         sortBy.setLabel("Sort by");
-        sortBy.setItems("Popularity", "Newest first", "Oldest first");
-        sortBy.setValue("Popularity");
+        sortBy.setClassName("my-select");
+        sortBy.setItems("Newest first", "Oldest first");
+        sortBy.setValue("Newest first");
+
 
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);
 
-        container.add(headerContainer, sortBy);
+        container.add(headerContainer, container2, sortBy);
         add(container, imageContainer);
-
     }
 }

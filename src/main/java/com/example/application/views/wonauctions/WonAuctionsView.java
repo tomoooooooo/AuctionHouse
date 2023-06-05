@@ -1,17 +1,13 @@
-package com.example.application.views.favoriteauctions;
+package com.example.application.views.wonauctions;
 
 import com.example.application.data.AuctionsViewCard;
 import com.example.application.data.entity.Auction;
 import com.example.application.data.services.AuctionService;
-import com.example.application.data.services.FavouriteService;
 import com.example.application.security.SecurityService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Main;
-import com.vaadin.flow.component.html.OrderedList;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -19,49 +15,52 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.JustifyContent;
 import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
-@PageTitle("Favorite auctions")
-@Route(value = "favorite", layout = MainLayout.class)
+@PageTitle("WonAuctions")
+@Route(value = "won", layout = MainLayout.class)
 @PermitAll
-public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
+public class WonAuctionsView extends Main implements HasComponents, HasStyle {
 
-    private final FavouriteService favouriteService;
-    private final SecurityService securityService;
     private final AuctionService auctionService;
-
-    private List<Auction> auctions;
+    private final SecurityService securityService;
 
     private OrderedList imageContainer;
-    private Select<String> sortBy;
+    private List<Auction> auctions;
+    Select<String> sortBy;
 
-    public FavoriteAuctions(FavouriteService favouriteService, SecurityService securityService, AuctionService auctionService) {
-        this.favouriteService = favouriteService;
-        this.securityService = securityService;
+    public WonAuctionsView(AuctionService auctionService, SecurityService securityService) {
         this.auctionService = auctionService;
-
-
+        this.securityService = securityService;
         constructUI();
 
-        auctions = favouriteService.findAll(securityService.getAuthenticatedUser().getUsername());
+        auctions = auctionService.findAll();
+        String user = securityService.getAuthenticatedUser().getUsername();
+        LocalDate nowDate = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
 
-        for(Auction a : auctions){
-            imageContainer.add(new AuctionsViewCard(a));
+        for(Auction a : auctions)
+        {
+            if(Objects.equals(a.getLastBidderUsername(), user))
+                if (a.getToLD().isBefore(nowDate) || (a.getToLD().isEqual(nowDate) && a.getToLT().isBefore(nowTime)))
+                    imageContainer.add(new AuctionsViewCard(a));
         }
+
 
         sortBy.addValueChangeListener(event -> {
             if(event.getValue().equals("Newest first")) {
-                auctions = this.auctionService.listSortedByNewest(auctions);
+                auctions = auctionService.listSortedByNewest(auctions);
                 imageContainer.removeAll();
                 for(Auction a : auctions)
                 {
@@ -70,30 +69,34 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
             }
             else if(event.getValue().equals("Oldest first")) {
                 imageContainer.removeAll();
-                auctions = this.auctionService.listSortedByOldest(auctions);
+                auctions = auctionService.listSortedByOldest(auctions);
                 for (Auction a : auctions) {
                     imageContainer.add(new AuctionsViewCard(a));
                 }
             }
         });
-
     }
 
     private void constructUI() {
-        addClassNames("auctions-view");
+        addClassNames("won-auctions-view");
         addClassNames(MaxWidth.SCREEN_LARGE, Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
 
         HorizontalLayout container = new HorizontalLayout();
         container.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
 
         VerticalLayout headerContainer = new VerticalLayout();
-        H2 header = new H2("Favorite Auction Items");
+        H2 header = new H2("Won Auctions");
         header.addClassNames("header");
-        //header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
-        Paragraph description = new Paragraph("Here you can find the items added by you as favorites.");
-        //description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
+        Paragraph description = new Paragraph("Here you can find the items you won in auctions!");
         description.addClassName("description");
         headerContainer.add(header, description);
+
+        HorizontalLayout container2 = new HorizontalLayout();
+        container2.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
+
+        Label selectLabel = new Label("Sort by");
+        selectLabel.addClassName("label");
+        container2.add(selectLabel);
 
         sortBy = new Select<>();
         sortBy.setLabel("Sort by");
@@ -101,11 +104,11 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
         sortBy.setItems("Newest first", "Oldest first");
         sortBy.setValue("Newest first");
 
+
         imageContainer = new OrderedList();
         imageContainer.addClassNames(Gap.MEDIUM, Display.GRID, ListStyleType.NONE, Margin.NONE, Padding.NONE);
 
-        container.add(headerContainer, sortBy);
+        container.add(headerContainer, container2, sortBy);
         add(container, imageContainer);
-
     }
 }

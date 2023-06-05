@@ -19,6 +19,7 @@ import java.util.Optional;
 @Tag("vcf-nav-item")
 public class AppNavItem extends Component {
 
+
     /**
      * Creates a menu item which does not link to any view but only shows the given
      * label.

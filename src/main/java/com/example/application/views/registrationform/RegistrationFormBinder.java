@@ -38,13 +38,8 @@ public class RegistrationFormBinder {
 
         registrationForm.getSubmitButton().addClickListener(event -> {
             try {
-
                 Users userBean = new Users();
-
-
                 binder.writeBean(userBean);
-
-
                 showSuccess(userBean);
             } catch (ValidationException exception) {
 

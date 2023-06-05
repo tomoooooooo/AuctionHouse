@@ -1,5 +1,6 @@
-package com.example.application.views.favoriteauctions;
+package com.example.application.views.adminauctions;
 
+import com.example.application.data.AdminAuctionsViewCard;
 import com.example.application.data.AuctionsViewCard;
 import com.example.application.data.entity.Auction;
 import com.example.application.data.services.AuctionService;
@@ -28,15 +29,16 @@ import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
+import java.util.Objects;
 
-@PageTitle("Favorite auctions")
-@Route(value = "favorite", layout = MainLayout.class)
-@PermitAll
-public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
+@PageTitle("Administrator auctions")
+@Route(value = "admin", layout = MainLayout.class)
+@RolesAllowed("ADMIN")
+public class AdminAuctionView extends Main implements HasComponents, HasStyle {
 
-    private final FavouriteService favouriteService;
     private final SecurityService securityService;
     private final AuctionService auctionService;
 
@@ -45,18 +47,18 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
     private OrderedList imageContainer;
     private Select<String> sortBy;
 
-    public FavoriteAuctions(FavouriteService favouriteService, SecurityService securityService, AuctionService auctionService) {
-        this.favouriteService = favouriteService;
+    public AdminAuctionView(SecurityService securityService, AuctionService auctionService) {
         this.securityService = securityService;
         this.auctionService = auctionService;
 
 
         constructUI();
 
-        auctions = favouriteService.findAll(securityService.getAuthenticatedUser().getUsername());
+        auctions = auctionService.findAll();
 
         for(Auction a : auctions){
-            imageContainer.add(new AuctionsViewCard(a));
+            if(Objects.equals(a.getAccepted(), "waiting"))
+                imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
         }
 
         sortBy.addValueChangeListener(event -> {
@@ -65,14 +67,14 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
                 imageContainer.removeAll();
                 for(Auction a : auctions)
                 {
-                    imageContainer.add(new AuctionsViewCard(a));
+                    imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
                 }
             }
             else if(event.getValue().equals("Oldest first")) {
                 imageContainer.removeAll();
                 auctions = this.auctionService.listSortedByOldest(auctions);
                 for (Auction a : auctions) {
-                    imageContainer.add(new AuctionsViewCard(a));
+                    imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
                 }
             }
         });
@@ -80,17 +82,17 @@ public class FavoriteAuctions extends Main implements HasComponents, HasStyle {
     }
 
     private void constructUI() {
-        addClassNames("auctions-view");
+        addClassNames("admin-auctions-view");
         addClassNames(MaxWidth.SCREEN_LARGE, Margin.Horizontal.AUTO, Padding.Bottom.LARGE, Padding.Horizontal.LARGE);
 
         HorizontalLayout container = new HorizontalLayout();
         container.addClassNames(AlignItems.CENTER, JustifyContent.BETWEEN);
 
         VerticalLayout headerContainer = new VerticalLayout();
-        H2 header = new H2("Favorite Auction Items");
+        H2 header = new H2("Added auctions");
         header.addClassNames("header");
         //header.addClassNames(Margin.Bottom.NONE, Margin.Top.XLARGE, FontSize.XXXLARGE);
-        Paragraph description = new Paragraph("Here you can find the items added by you as favorites.");
+        Paragraph description = new Paragraph("Here you can find the items added which have to be accepted or rejected.");
         //description.addClassNames(Margin.Bottom.XLARGE, Margin.Top.NONE, TextColor.SECONDARY);
         description.addClassName("description");
         headerContainer.add(header, description);
