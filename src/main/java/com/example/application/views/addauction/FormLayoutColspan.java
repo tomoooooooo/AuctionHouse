@@ -188,6 +188,8 @@ public class FormLayoutColspan extends Div {
                 auction.setFromLT(fromTP.getValue());
                 auction.setToLD(dateTo.getValue());
                 auction.setToLT(toTP.getValue());
+                auction.setLastBidderUsername("");
+                auction.setAccepted("waiting");
 
                 auctionRepository.save(auction);
 

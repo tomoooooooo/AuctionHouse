@@ -60,7 +60,7 @@ public class SecurityConfig extends VaadinWebSecurity {
             UserDetails user1 = User.builder()
                     .username(u.getUsername())
                     .password("{noop}"+u.getPassword())
-                    .roles("USER")
+                    .roles(String.valueOf(u.getUserRole()))
                     .build();
 
             userDetails.add(user1);

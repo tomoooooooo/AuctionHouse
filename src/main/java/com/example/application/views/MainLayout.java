@@ -3,7 +3,8 @@ package com.example.application.views;
 
 import com.example.application.components.appnav.AppNav;
 import com.example.application.components.appnav.AppNavItem;
-import com.example.application.data.AdminAuctionsViewCard;
+import com.example.application.data.entity.UserRole;
+import com.example.application.data.services.UserService;
 import com.example.application.security.SecurityService;
 import com.example.application.views.addauction.AddAuctionView;
 import com.example.application.views.adminauctions.AdminAuctionView;
@@ -22,17 +23,20 @@ import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
-
+    private final SecurityService securityService;
+    private final UserService userService;
     private H2 viewTitle;
+    private Button logout;
 
-    public MainLayout() {
+    public MainLayout(SecurityService securityService, UserService userService) {
+        this.securityService = securityService;
+        this.userService = userService;
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
@@ -48,10 +52,13 @@ public class MainLayout extends AppLayout {
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
 
-       //Button logout = new Button("Log out ", e -> securityService.logout());
+        logout = new Button("Log out ");
+        logout.addClickListener(event ->{
+            securityService.logout();
+        });
 
 
-        addToNavbar(true, toggle, viewTitle);
+        addToNavbar(true, toggle, viewTitle, logout);
     }
 
     private void addDrawerContent() {
@@ -86,15 +93,21 @@ public class MainLayout extends AppLayout {
         AppNavItem a5 = new AppNavItem("Won Auctions", WonAuctionsView.class, LineAwesomeIcon.TH_LIST_SOLID.create());
         a5.setClassName("nav-item");
 
-        AppNavItem a6 = new AppNavItem("Administrator", AdminAuctionView.class, LineAwesomeIcon.TH_LIST_SOLID.create());
-        a6.setClassName("nav-item");
-
         nav.addItem(a1);
         nav.addItem(a2);
         nav.addItem(a3);
         nav.addItem(a5);
         nav.addItem(a4);
-        nav.addItem(a6);
+
+        if(securityService.getAuthenticatedUser() != null)
+            if(userService.findByUsername(securityService.getAuthenticatedUser().getUsername()).get().getUserRole() == UserRole.ADMIN) {
+                AppNavItem a6 = new AppNavItem("Administrator", AdminAuctionView.class, LineAwesomeIcon.TH_LIST_SOLID.create());
+                a6.setClassName("nav-item");
+                nav.addItem(a6);
+            }
+
+
+
 
         return nav;
     }

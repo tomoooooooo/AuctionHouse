@@ -13,6 +13,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
@@ -26,9 +27,11 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 
 import java.util.List;
+import java.util.Objects;
 
 @PageTitle("Auctions")
 @Route(value = "", layout = MainLayout.class)
+
 @AnonymousAllowed
 public class AuctionsView extends Main implements HasComponents, HasStyle {
 
@@ -42,11 +45,13 @@ public class AuctionsView extends Main implements HasComponents, HasStyle {
         this.auctionService = auctionService;
         constructUI();
 
+
         auctions = auctionService.findAll();
 
         for(Auction a : auctions)
         {
-            imageContainer.add(new AuctionsViewCard(a));
+            if(Objects.equals(a.getAccepted(), "accepted"))
+                imageContainer.add(new AuctionsViewCard(a));
         }
 
 

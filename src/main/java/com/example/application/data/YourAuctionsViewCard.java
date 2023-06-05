@@ -122,7 +122,7 @@ public class YourAuctionsViewCard extends ListItem {
         });
         Button edit = new Button("Edit");
         edit.addClickListener(e -> {
-            UI.getCurrent().navigate("edit");
+            UI.getCurrent().navigate("edit/"+auction.getId());
         });
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(view, delete, edit

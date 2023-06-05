@@ -36,6 +36,7 @@ public class AdminAuctionsViewCard extends ListItem {
     private AuctionService auctionService;
 
     private Span status;
+    private Button accept, reject;
 
     private void setStatus(String value) {
         status.setText("Status: " + value);
@@ -82,9 +83,9 @@ public class AdminAuctionsViewCard extends ListItem {
             UI.getCurrent().navigate("auctionItem/" + auction.getId());
         });
 
-        Button delete = new Button("Accept");
-        delete.getStyle().set("background-color", "green");
-        delete.addClickListener(e -> {
+        accept = new Button("Accept");
+        accept.getStyle().set("background-color", "green");
+        accept.addClickListener(e -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -101,16 +102,15 @@ public class AdminAuctionsViewCard extends ListItem {
             dialog.setRejectText("Discard");
             dialog.addRejectListener(event -> {
                 setStatus("Discarded");
-                Notification notification = Notification
-                        .show("Discarded");
+                Notification notification = Notification.show("Discarded");
             });
 
             dialog.setConfirmText("Accept");
             dialog.addConfirmListener(event -> {
-                auctionService.delete(auction);
-                setStatus("Deleted");
-                Notification notification = Notification
-                        .show("Item accepted");
+                auction.setAccepted("accepted");
+                auctionService.update(auction);
+                setStatus("Accepted");
+                Notification notification = Notification.show("Item accepted");
             });
 
 
@@ -120,9 +120,9 @@ public class AdminAuctionsViewCard extends ListItem {
 
 
         });
-        Button edit = new Button("Reject");
-        edit.getStyle().set("background-color", "red");
-        edit.addClickListener(e -> {
+        reject = new Button("Reject");
+        reject.getStyle().set("background-color", "red");
+        reject.addClickListener(e -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(FlexComponent.Alignment.CENTER);
             layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
@@ -145,8 +145,9 @@ public class AdminAuctionsViewCard extends ListItem {
 
             dialog.setConfirmText("Reject");
             dialog.addConfirmListener(event -> {
-                auctionService.delete(auction);
-                setStatus("Deleted");
+                auction.setAccepted("rejected");
+                auctionService.update(auction);
+                setStatus("Rejected");
                 Notification notification = Notification
                         .show("Item rejected");
             });
@@ -159,8 +160,7 @@ public class AdminAuctionsViewCard extends ListItem {
 
         });
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(view, delete, edit
-        );
+        HorizontalLayout horizontalLayout = new HorizontalLayout(view, accept, reject);
         add(horizontalLayout);
 
         add(div, header, subtitle, description, horizontalLayout);

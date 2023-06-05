@@ -67,8 +67,26 @@ public class AuctionService {
         Optional<Auction> auctionToBeUpdated = auctionRepository.findById(auction.getId());
         if(auctionToBeUpdated.isPresent()) {
             Auction existingAuction = auctionToBeUpdated.get();
+
+            existingAuction.setTitle(auction.getTitle());
+            existingAuction.setDescription(auction.getDescription());
+
             existingAuction.setCurrentPrice(auction.getCurrentPrice());
+            existingAuction.setStartingPrice(auction.getStartingPrice());
+
             existingAuction.setLastBidderUsername(auction.getLastBidderUsername());
+            existingAuction.setAuctionerUsername(auction.getAuctionerUsername());
+
+            existingAuction.setImage(auction.getImage());
+
+            existingAuction.setFromLD(auction.getFromLD());
+            existingAuction.setToLD(auction.getToLD());
+            existingAuction.setFromLT(auction.getFromLT());
+            existingAuction.setToLT(auction.getToLT());
+
+            existingAuction.setAccepted(auction.getAccepted());
+
+
             auctionRepository.save(existingAuction);
         }
     }

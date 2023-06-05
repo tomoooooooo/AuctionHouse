@@ -29,15 +29,16 @@ import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 
 import java.util.List;
+import java.util.Objects;
 
 @PageTitle("Administrator auctions")
 @Route(value = "admin", layout = MainLayout.class)
-@PermitAll
+@RolesAllowed("ADMIN")
 public class AdminAuctionView extends Main implements HasComponents, HasStyle {
 
-    private final FavouriteService favouriteService;
     private final SecurityService securityService;
     private final AuctionService auctionService;
 
@@ -46,18 +47,18 @@ public class AdminAuctionView extends Main implements HasComponents, HasStyle {
     private OrderedList imageContainer;
     private Select<String> sortBy;
 
-    public AdminAuctionView(FavouriteService favouriteService, SecurityService securityService, AuctionService auctionService) {
-        this.favouriteService = favouriteService;
+    public AdminAuctionView(SecurityService securityService, AuctionService auctionService) {
         this.securityService = securityService;
         this.auctionService = auctionService;
 
 
         constructUI();
 
-        auctions = favouriteService.findAll(securityService.getAuthenticatedUser().getUsername());
+        auctions = auctionService.findAll();
 
         for(Auction a : auctions){
-            imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
+            if(Objects.equals(a.getAccepted(), "waiting"))
+                imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
         }
 
         sortBy.addValueChangeListener(event -> {
@@ -66,14 +67,14 @@ public class AdminAuctionView extends Main implements HasComponents, HasStyle {
                 imageContainer.removeAll();
                 for(Auction a : auctions)
                 {
-                    imageContainer.add(new AuctionsViewCard(a));
+                    imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
                 }
             }
             else if(event.getValue().equals("Oldest first")) {
                 imageContainer.removeAll();
                 auctions = this.auctionService.listSortedByOldest(auctions);
                 for (Auction a : auctions) {
-                    imageContainer.add(new AuctionsViewCard(a));
+                    imageContainer.add(new AdminAuctionsViewCard(a, auctionService));
                 }
             }
         });

@@ -1,8 +1,10 @@
 package com.example.application.views.AuctionItem;
 
 import com.example.application.data.entity.Auction;
+import com.example.application.data.entity.AutomaticBid;
 import com.example.application.data.entity.Favourite;
 import com.example.application.data.services.AuctionService;
+import com.example.application.data.services.AutomaticBidService;
 import com.example.application.data.services.FavouriteService;
 import com.example.application.security.SecurityService;
 import com.vaadin.flow.component.UI;
@@ -20,6 +22,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import jakarta.annotation.security.PermitAll;
 
+import java.awt.desktop.SystemEventListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -35,6 +38,8 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
     private final AuctionService auctionService;
     private final FavouriteService favouriteService;
     private final SecurityService securityService;
+    private final AutomaticBidService automaticBidService;
+
     private H1 header;
     private List<Auction> auctionsList;
     private Auction auction;
@@ -46,6 +51,7 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
     private Button bid;
     private Button favorite;
     private Notification notification;
+    private Button automatic;
 
     @Override
     public void setParameter(BeforeEvent beforeEvent, @OptionalParameter String parameter) {
@@ -64,7 +70,7 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
                         a.getToLD(),
                         a.getFromLT(),
                         a.getToLT(),
-                        a.isAccepted()
+                        a.getAccepted()
                         );
             }
         header.setText("Title: " + auction.getTitle());
@@ -97,6 +103,9 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
         }else if(auction.getToLD().isBefore(LocalDate.now()) || (auction.getToLD().isEqual(LocalDate.now()) && auction.getToLT().isBefore(LocalTime.now()))){
             status.setValue("Closed auction");
             status.getStyle().set("background-color", "red");
+            automatic.setEnabled(false);
+            bid.setEnabled(false);
+
         }
 
         if(securityService.getAuthenticatedUser().getUsername().equals(auction.getAuctionerUsername()))
@@ -104,6 +113,8 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
             euroField.setHelperText("You can't bid for your own auction!");
             euroField.setReadOnly(true);
             euroField.setValue(0.0);
+            automatic.setEnabled(false);
+            bid.setEnabled(false);
         }
 
         bid.addClickListener(event -> {
@@ -115,9 +126,39 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
                     notification = Notification.show("Your bid is too low!");
                 else {
                     notification = Notification.show("You bidded for " + euroField.getValue() + " successfully!");
-                    auction.setLastBidderUsername(securityService.getAuthenticatedUser().getUsername());
-                    auction.setCurrentPrice(euroField.getValue());
-                    auctionService.update(auction);
+
+
+                    List<AutomaticBid> automaticBidList = automaticBidService.findByAuctionId(Long.parseLong(parameter));
+                    Double max1 = 0.0, max2 = 0.0;
+                    String autoBidUSername = "";
+                    for(AutomaticBid a : automaticBidList){
+                        if(max1 < a.getMaximumPrice()){
+                            max2 = max1;
+                            max1 = a.getMaximumPrice();
+                            autoBidUSername = a.getUsername();
+                        }
+                    }
+
+                    if(euroField.getValue() < max2){
+                        if(!autoBidUSername.equals(auction.getLastBidderUsername())) {
+                            auction.setLastBidderUsername(autoBidUSername);
+                            auction.setCurrentPrice(Math.min(max2 * 1.01, max1));
+                            auctionService.update(auction);
+                        }
+                    }
+                    else {
+                        if(euroField.getValue() < max1){
+                            auction.setLastBidderUsername(autoBidUSername);
+                            auction.setCurrentPrice(Math.min(euroField.getValue() * 1.01, max1));
+                            auctionService.update(auction);
+                        }
+                        else {
+                            auction.setLastBidderUsername(securityService.getAuthenticatedUser().getUsername());
+                            auction.setCurrentPrice(euroField.getValue());
+                            auctionService.update(auction);
+                        }
+                    }
+
 
                     details.setValue("Starting date: " + auction.getFromLD() + "  Starting hour: " + auction.getFromLT() + "\n" +
                             "Ending date: " + auction.getToLD() + "  Ending hour: " + auction.getToLT() + "\n" +
@@ -144,16 +185,21 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
                 favorite.setText("Remove from Favourite!");
             }
         });
+
+        automatic.addClickListener(e -> {
+            UI.getCurrent().navigate("automaticBid/" + parameter);
+        });
     }
 
 
-    public AuctionItem(AuctionService auctionService, FavouriteService favouriteService, SecurityService securityService) {
+    public AuctionItem(AuctionService auctionService, FavouriteService favouriteService, SecurityService securityService, AutomaticBidService automaticBidService) {
         this.auctionService = auctionService;
         this.favouriteService = favouriteService;
         this.securityService = securityService;
 
 
         auctionsList = auctionService.findAll();
+        this.automaticBidService = automaticBidService;
 
         setSpacing(true);
 
@@ -208,10 +254,7 @@ public class AuctionItem extends VerticalLayout implements HasUrlParameter<Strin
             UI.getCurrent().navigate("");
         });
 
-        Button automatic = new Button("Automatic Bid");
-        automatic.addClickListener(e -> {
-            UI.getCurrent().navigate("automaticBid");
-        });
+        automatic = new Button("Automatic Bid");
 
         HorizontalLayout horizontalLayout = new HorizontalLayout(back, automatic, bid);
         add(horizontalLayout);

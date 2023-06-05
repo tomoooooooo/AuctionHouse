@@ -25,7 +25,6 @@ public class Auction {
 
     @NotBlank
     private String title;
-
     private String description;
     private double startingPrice;
     private double currentPrice;
@@ -36,7 +35,7 @@ public class Auction {
     private LocalDate toLD;
     private LocalTime fromLT;
     private LocalTime toLT;
-    private boolean accepted;
+    private String accepted;
 
 
     public Auction(String title, String description, double startingPrice, String auctionerUsername, byte[] image) {
@@ -45,10 +44,10 @@ public class Auction {
         this.startingPrice = startingPrice;
         this.auctionerUsername = auctionerUsername;
         this.image = image;
-        this.accepted = false;
+        this.accepted = "waiting";
     }
 
-    public Auction(Long id, String title, String description, double startingPrice, double currentPrice, String lastBidderUsername, String auctionerUsername, byte[] image, LocalDate fromLD, LocalDate toLD, LocalTime fromLT, LocalTime toLT, boolean accepted) {
+    public Auction(Long id, String title, String description, double startingPrice, double currentPrice, String lastBidderUsername, String auctionerUsername, byte[] image, LocalDate fromLD, LocalDate toLD, LocalTime fromLT, LocalTime toLT, String accepted) {
         this.id = id;
         this.title = title;
         this.description = description;

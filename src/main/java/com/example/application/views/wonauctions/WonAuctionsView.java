@@ -3,6 +3,7 @@ package com.example.application.views.wonauctions;
 import com.example.application.data.AuctionsViewCard;
 import com.example.application.data.entity.Auction;
 import com.example.application.data.services.AuctionService;
+import com.example.application.security.SecurityService;
 import com.example.application.views.MainLayout;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.HasStyle;
@@ -10,23 +11,22 @@ import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
 import com.vaadin.flow.theme.lumo.LumoUtility.Display;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
 import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
 import com.vaadin.flow.theme.lumo.LumoUtility.JustifyContent;
 import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
 import com.vaadin.flow.theme.lumo.LumoUtility.MaxWidth;
 import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import jakarta.annotation.security.PermitAll;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
 
 @PageTitle("WonAuctions")
 @Route(value = "won", layout = MainLayout.class)
@@ -34,20 +34,27 @@ import java.util.List;
 public class WonAuctionsView extends Main implements HasComponents, HasStyle {
 
     private final AuctionService auctionService;
+    private final SecurityService securityService;
 
     private OrderedList imageContainer;
     private List<Auction> auctions;
     Select<String> sortBy;
 
-    public WonAuctionsView(AuctionService auctionService) {
+    public WonAuctionsView(AuctionService auctionService, SecurityService securityService) {
         this.auctionService = auctionService;
+        this.securityService = securityService;
         constructUI();
 
         auctions = auctionService.findAll();
+        String user = securityService.getAuthenticatedUser().getUsername();
+        LocalDate nowDate = LocalDate.now();
+        LocalTime nowTime = LocalTime.now();
 
         for(Auction a : auctions)
         {
-            imageContainer.add(new AuctionsViewCard(a));
+            if(Objects.equals(a.getLastBidderUsername(), user))
+                if (a.getToLD().isBefore(nowDate) || (a.getToLD().isEqual(nowDate) && a.getToLT().isBefore(nowTime)))
+                    imageContainer.add(new AuctionsViewCard(a));
         }
 
 
